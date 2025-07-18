@@ -1,58 +1,65 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-
-[TestClass]
-public class PriorityQueueTests
+﻿public class PriorityQueue
 {
-    [TestMethod]
-    // Scenario: Enqueue items with different priorities and dequeue once.
-    // Expected Result: The item with the highest priority (Banana, 5) is returned.
-    // Defect(s) Found: 
-    public void TestPriorityQueue_HighestPriority()
-    {
-        var queue = new PriorityQueue();
-        queue.Enqueue("Apple", 1);
-        queue.Enqueue("Banana", 5);
-        queue.Enqueue("Cherry", 3);
+    private List<PriorityItem> _queue = new();
 
-        var result = queue.Dequeue();
-        Assert.AreEqual("Banana", result);
+    /// <summary>
+    /// Add a new value to the queue with an associated priority.  The
+    /// node is always added to the back of the queue regardless of 
+    /// the priority.
+    /// </summary>
+    /// <param name="value">The value</param>
+    /// <param name="priority">The priority</param>
+    public void Enqueue(string value, int priority)
+    {
+        var newNode = new PriorityItem(value, priority);
+        _queue.Add(newNode);
     }
 
-    [TestMethod]
-    // Scenario: Enqueue multiple items with the same highest priority. Dequeue should follow FIFO for same priority.
-    // Expected Result: "Tom" (priority 4) should be returned before "Jerry" (priority 4).
-    // Defect(s) Found: 
-    public void TestPriorityQueue_TieBreakerFIFO()
+public string Dequeue()
+{
+    if (_queue.Count == 0) // Verify the queue is not empty
     {
-        var queue = new PriorityQueue();
-        queue.Enqueue("Tom", 4);
-        queue.Enqueue("Jerry", 4);
-        queue.Enqueue("Spike", 2);
-
-        var result1 = queue.Dequeue();
-        var result2 = queue.Dequeue();
-
-        Assert.AreEqual("Tom", result1);
-        Assert.AreEqual("Jerry", result2);
+        throw new InvalidOperationException("The queue is empty.");
     }
 
-    [TestMethod]
-    // Scenario: Call Dequeue on an empty queue.
-    // Expected Result: An InvalidOperationException with message "The queue is empty." should be thrown.
-    // Defect(s) Found: 
-    public void TestPriorityQueue_Empty()
+    // Find the index of the item with the highest priority to remove
+    var highPriorityIndex = 0;
+    for (int index = 1; index < _queue.Count; index++) // Fixed off-by-one error
     {
-        var queue = new PriorityQueue();
+        if (_queue[index].Priority > _queue[highPriorityIndex].Priority)
+        {
+            highPriorityIndex = index;
+        }
+    }
 
-        try
-        {
-            queue.Dequeue();
-            Assert.Fail("Expected exception was not thrown.");
-        }
-        catch (InvalidOperationException e)
-        {
-            Assert.AreEqual("The queue is empty.", e.Message);
-        }
+    var value = _queue[highPriorityIndex].Value;
+
+    // Remove the item from the queue (FIFO is preserved automatically by using index)
+    _queue.RemoveAt(highPriorityIndex);
+
+    return value;
+}
+
+
+    public override string ToString()
+    {
+        return $"[{string.Join(", ", _queue)}]";
+    }
+}
+
+internal class PriorityItem
+{
+    internal string Value { get; set; }
+    internal int Priority { get; set; }
+
+    internal PriorityItem(string value, int priority)
+    {
+        Value = value;
+        Priority = priority;
+    }
+
+    public override string ToString()
+    {
+        return $"{Value} (Pri:{Priority})";
     }
 }
