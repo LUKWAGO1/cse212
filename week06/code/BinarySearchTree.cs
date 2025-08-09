@@ -9,41 +9,39 @@ public class BinarySearchTree : IEnumerable<int>
     /// </summary>
     public void Insert(int value)
     {
-        // Create new node
         Node newNode = new(value);
-        // If the list is empty, then point both head and tail to the new node.
+        // If the tree is empty, set the root node
         if (_root is null)
         {
             _root = newNode;
         }
-        // If the list is not empty, then only head will be affected.
         else
         {
+            // Recursively call Insert on the root node
             _root.Insert(value);
         }
     }
 
     /// <summary>
-    /// Check to see if the tree contains a certain value
+    /// Check to see if the tree contains a certain value.
     /// </summary>
-    /// <param name="value">The value to look for</param>
-    /// <returns>true if found, otherwise false</returns>
+    /// <param name="value">The value to look for.</param>
+    /// <returns>true if found, otherwise false.</returns>
     public bool Contains(int value)
     {
         return _root != null && _root.Contains(value);
     }
 
     /// <summary>
-    /// Yields all values in the tree
+    /// Yields all values in the tree.
     /// </summary>
     IEnumerator IEnumerable.GetEnumerator()
     {
-        // call the generic version of the method
         return GetEnumerator();
     }
 
     /// <summary>
-    /// Iterate forward through the BST
+    /// Iterate forward through the BST.
     /// </summary>
     public IEnumerator<int> GetEnumerator()
     {
@@ -66,7 +64,7 @@ public class BinarySearchTree : IEnumerable<int>
     }
 
     /// <summary>
-    /// Iterate backward through the BST.
+    /// Iterate backward through the BST (largest to smallest).
     /// </summary>
     public IEnumerable Reverse()
     {
@@ -80,11 +78,16 @@ public class BinarySearchTree : IEnumerable<int>
 
     private void TraverseBackward(Node? node, List<int> values)
     {
-        // TODO Problem 3
+        if (node is not null)
+        {
+            TraverseBackward(node.Right, values); // Right subtree
+            values.Add(node.Data); // Current node
+            TraverseBackward(node.Left, values); // Left subtree
+        }
     }
 
     /// <summary>
-    /// Get the height of the tree
+    /// Get the height of the tree.
     /// </summary>
     public int GetHeight()
     {
@@ -99,8 +102,10 @@ public class BinarySearchTree : IEnumerable<int>
     }
 }
 
-public static class IntArrayExtensionMethods {
-    public static string AsString(this IEnumerable array) {
+public static class IntArrayExtensionMethods
+{
+    public static string AsString(this IEnumerable array)
+    {
         return "<IEnumerable>{" + string.Join(", ", array.Cast<int>()) + "}";
     }
 }
